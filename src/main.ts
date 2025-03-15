@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import { Client } from '@notionhq/client'
 import { createBlocksFromMarkdown } from './create-blocks-from-markdown.js'
 import { deleteAllBlocks } from './delete-all-blocks.js'
+import { getNotionPages } from './get-notion-pages.js'
 
 /**
  * The main function for the action.
@@ -10,15 +11,22 @@ import { deleteAllBlocks } from './delete-all-blocks.js'
  */
 export async function run(): Promise<void> {
   try {
-    const pageId: string = core.getInput('page_id', { required: true })
+    const parentPageId: string = core.getInput('parent_page_id', {
+      required: true,
+    })
     const notionApiKey: string = core.getInput('notion_api_key', {
       required: true,
     })
+    const files: string = core.getInput('files', { required: true })
 
     const notion = new Client({ auth: notionApiKey })
 
-    await deleteAllBlocks(notion, pageId)
-    await createBlocksFromMarkdown(notion, pageId)
+    const notionPages = await getNotionPages(notion, parentPageId, files)
+
+    for (const notionPage of notionPages) {
+      await deleteAllBlocks(notion, notionPage)
+      await createBlocksFromMarkdown(notion, notionPage)
+    }
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) {
