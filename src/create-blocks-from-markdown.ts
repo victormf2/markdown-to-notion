@@ -1,14 +1,14 @@
+import { Client } from '@notionhq/client'
 import type { BlockObjectRequest } from '@notionhq/client/build/src/api-endpoints'
 import remarkParse from 'remark-parse'
 import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
-import { notion } from './client.js'
 import { logger } from './logger.js'
 import { parseFallback } from './markdown-node-transformers/fallback.js'
 import { parseHeading } from './markdown-node-transformers/heading.js'
 import { parseParagraph } from './markdown-node-transformers/paragraph.js'
 
-export async function createBlocksFromMarkdown(pageId: string) {
+export async function createBlocksFromMarkdown(notion: Client, pageId: string) {
   const markdown = `
   # Main Title
   
