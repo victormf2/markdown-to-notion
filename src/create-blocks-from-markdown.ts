@@ -26,13 +26,13 @@ export async function createBlocksFromMarkdown(pageId: string) {
   * Since we're only handling paragraphs and headings
   `
 
-  logger.debug({ pageId }, 'Parsing markdown..')
+  logger.info({ pageId }, 'Parsing markdown..')
   const blocks = markdownToNotion(markdown)
-  logger.debug({ pageId }, 'Markdown parsed.')
+  logger.info({ pageId }, 'Markdown parsed.')
 
-  logger.debug({ pageId }, 'Appending blocks to page..')
+  logger.info({ pageId }, 'Appending blocks to page..')
   await notion.blocks.children.append({ block_id: pageId, children: blocks })
-  logger.debug({ pageId }, 'Blocks appended.')
+  logger.info({ pageId }, 'Blocks appended.')
 }
 
 function markdownToNotion(markdown: string): BlockObjectRequest[] {
