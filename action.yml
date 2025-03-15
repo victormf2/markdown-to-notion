@@ -13,6 +13,9 @@ inputs:
   page_id:
     description: Id of Notion page to update
     required: true
+  notion_api_key:
+    description: Notion API key
+    required: true
 
 # Define your outputs here.
 outputs: {}

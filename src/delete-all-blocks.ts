@@ -1,8 +1,9 @@
+import { Client } from '@notionhq/client'
 import { ListBlockChildrenResponse } from '@notionhq/client/build/src/api-endpoints'
-import { notion } from './client.js'
+import { setTimeout } from 'timers/promises'
 import { logger } from './logger.js'
 
-export async function deleteAllBlocks(pageId: string) {
+export async function deleteAllBlocks(notion: Client, pageId: string) {
   logger.info({ pageId }, 'Retrieving notion page block..')
 
   type BlockItem = ListBlockChildrenResponse['results'][number]
@@ -29,14 +30,23 @@ export async function deleteAllBlocks(pageId: string) {
       ? 'Empty page, no blocks to delete.'
       : 'Deleting all page blocks...',
   )
-  for (let i = 0; i < oldBlocks.length; i++) {
-    const block = oldBlocks[i]
-    logger.info(
-      { pageId, blockIndex: i, blockId: block.id },
-      'Deleting block..',
-    )
-    await notion.blocks.delete({ block_id: block.id })
-    logger.info({ pageId, blockIndex: i, blockId: block.id }, 'Finished.')
+
+  // rate limit of notion is average 3 reqs/sec
+  // https://developers.notion.com/reference/request-limits#rate-limits
+  const batchSize = 3
+  for (let i = 0; i < oldBlocks.length; i += batchSize) {
+    const blocksBatch = oldBlocks.slice(i, i + batchSize)
+
+    const deleteBatchOfBlocks = blocksBatch.map(async (block) => {
+      logger.info({ pageId, blockId: block.id }, 'Deleting block..')
+      await notion.blocks.delete({ block_id: block.id })
+      logger.info({ pageId, blockId: block.id }, 'Block deleted.')
+    })
+
+    // applying a delay of 1 second
+    deleteBatchOfBlocks.push(setTimeout(1000))
+
+    await Promise.all(deleteBatchOfBlocks)
   }
   logger.info({ pageId }, 'Finished deleting all page blocks.')
 }
