@@ -1,7 +1,7 @@
 {
-  "name": "typescript-action",
+  "name": "markdown-to-notion",
   "description": "GitHub Actions TypeScript template",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "author": "",
   "type": "module",
   "private": true,
@@ -43,6 +43,7 @@
     "@actions/github": "^6.0.0",
     "@notionhq/client": "^2.2.16",
     "dotenv": "^16.4.7",
+    "glob": "^11.0.1",
     "mdast-util-to-markdown": "^2.1.2",
     "remark-parse": "^11.0.0",
     "unified": "^11.0.5",

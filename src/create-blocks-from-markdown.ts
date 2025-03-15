@@ -1,5 +1,6 @@
 import { Client } from '@notionhq/client'
 import type { BlockObjectRequest } from '@notionhq/client/build/src/api-endpoints'
+import { readFile } from 'node:fs/promises'
 import remarkParse from 'remark-parse'
 import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
@@ -7,24 +8,15 @@ import { logger } from './logger.js'
 import { parseFallback } from './markdown-node-transformers/fallback.js'
 import { parseHeading } from './markdown-node-transformers/heading.js'
 import { parseParagraph } from './markdown-node-transformers/paragraph.js'
+import { NotionPageMetadata } from './types.js'
 
-export async function createBlocksFromMarkdown(notion: Client, pageId: string) {
-  const markdown = `
-  # Main Title
-  
-  This is a paragraph with some text.
-  
-  ## Section 1
-  
-  Another paragraph here.
-  
-  ### Subsection
-  
-  More content here.
-  
-  * This list will be converted to a code block
-  * Since we're only handling paragraphs and headings
-  `
+export async function createBlocksFromMarkdown(
+  notion: Client,
+  notionPage: NotionPageMetadata,
+) {
+  const { pageId, file } = notionPage
+
+  const markdown = await readFile(file, { encoding: 'utf-8' })
 
   logger.info({ pageId }, 'Parsing markdown..')
   const blocks = markdownToNotion(markdown)

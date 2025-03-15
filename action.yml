@@ -10,11 +10,16 @@ branding:
 
 # Define your inputs here.
 inputs:
-  page_id:
-    description: Id of Notion page to update
+  parent_page_id:
+    description: Id of Notion parent page to update
     required: true
   notion_api_key:
     description: Notion API key
+    required: true
+  files:
+    description:
+      glob pattern of markdown files to convert to Notion pages under parent
+      page
     required: true
 
 # Define your outputs here.

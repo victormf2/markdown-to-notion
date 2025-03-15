@@ -2,8 +2,13 @@ import { Client } from '@notionhq/client'
 import { ListBlockChildrenResponse } from '@notionhq/client/build/src/api-endpoints'
 import { logger } from './logger.js'
 import { retryRateLimit } from './notion.js'
+import { NotionPageMetadata } from './types.js'
 
-export async function deleteAllBlocks(notion: Client, pageId: string) {
+export async function deleteAllBlocks(
+  notion: Client,
+  notionPage: NotionPageMetadata,
+) {
+  const { pageId } = notionPage
   logger.info({ pageId }, 'Retrieving notion page block..')
 
   type BlockItem = ListBlockChildrenResponse['results'][number]
